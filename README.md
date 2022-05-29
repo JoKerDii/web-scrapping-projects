@@ -47,3 +47,168 @@ Select all tags listed after `<div class="intro">` and share the same parent `<b
 Selected all children tags inside `<div class="intro">`: `//div[@class='unique']/descendant::node()`.
 
 
+## Basic steps to web-scrapping
+
+Start a project
+
+```
+mkdir projects
+cd projects
+scrapy startproject worldometers
+
+cd worldometers
+scrapy genspider countries https://www.worldometers.info/world-population/population-by-country/
+```
+
+In `countries.py`, change `start_urls = ['http://www.worldometers.info/']` to `start_urls = ['https://www.worldometers.info/world-population/population-by-country/']`.
+
+
+```
+scrapy shell # shows some available Scrapy objects.
+fetch('https://www.worldometers.info/world-population/population-by-country/')
+r = scrapy.Request(url = 'https://www.worldometers.info/world-population/population-by-country/')
+fetch(r)
+response.body
+view(response)
+```
+
+Note that Scrapy cannot interpret JavaScript. Scrapy will return the raw HTML markup without JS, so we need to disable JS. 'Command + Shift + I' -> 'Command + Shift + P' -> disable JavaScript.
+
+XPath expressions & CSS Selectors to get the title.
+
+```
+title = response.xpath('//h1')
+title
+title = response.xpath('//h1/text()')
+title
+title.get()
+```
+
+```
+title_css = response.css('h1::text')
+title_css
+title_css.get()
+```
+
+XPath expressions & CSS Selectors to get all the countries.
+
+```
+countries = response.xpath('//td/a/text()').getall()
+countries 
+```
+
+```
+countries_css = response.css('td a ::text').getall()
+countries_css
+```
+
+Display the response
+
+```
+yield {
+    'title': title,
+    'country': country
+}
+```
+
+## Splash
+
+JS requires engine to be executed. Chrome has V8 engine. Firefox has Spider Monkey. Safari has Apple Web kit (same engine used by Splash). Microsoft Edge has Shakra. For scrapping those websites on which we really need JavaScript, we can use Splash or Selenium.
+
+To download Splash, we first download Docker and run
+
+```
+docker pull scrapinghub/splash
+```
+
+To start Splash at the first time, we run
+
+```
+docker run -it -p 8050:8050 scrapinghub/splash 
+```
+
+Then, open 'http://0.0.0.0:8050' on browser to start Splash.
+
+To start the Splash next time, we can use docker desktop, go dashboard, and click on start button of the specific app.
+
+To render the target website: https://duckduckgo.com, on http://0.0.0.0:8050 do
+
+```
+function main(splash, args)
+  url = args.url
+  assert(splash:go(url))
+  assert(spalsh:wait(1))
+  return {
+      splash:png(),
+      splash:html()
+  }
+end
+```
+
+We can use `select()` or `select_all()` to select elements. When searching results, sometimes we need to wait a little bit more seconds to render the webpage.
+
+
+We can click the button by either
+
+```
+btn = assert(splash:select("#search_button_homepage"))
+btn:mouse_click()
+```
+or
+
+```
+input_box:send_keys("<Enter>")
+```
+
+The full code is 
+
+```
+function main(splash, args)
+
+  url = args.url
+  assert(splash:go(url))
+  assert(splash:wait(1))
+  
+  input_box = assert(splash:select("#search_form_input_homepage"))
+  input_box:focus()
+  input_box:send_text("my user agent")
+  assert(splash:wait(0.5))
+  
+  --[[
+  btn = assert(splash:select("#search_button_homepage"))
+  btn:mouse_click()
+  --]]
+  input_box:send_keys("my user agent")
+  assert(splash:wait(5))
+
+  return {
+      splash:png(),
+      splash:html()
+  }
+end
+```
+
+To overwrite request headers (set user agent) we can do
+
+```
+splash:set_user_agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36")
+```
+or 
+
+```
+header = {
+    ['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36"
+}
+splash:set_custom_headers(headers)
+```
+or 
+
+```
+splash:on_request(function(request)
+    request:set_head('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36')
+end)
+```
+
+## Selenium
+
+

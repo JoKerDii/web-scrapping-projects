@@ -1,3 +1,7 @@
 autopep8==1.6.0
 pylint==2.13.9
 Scrapy==2.6.1
+scrapy-splash==0.8.0
+selenium=4.2.0
+webdriver-manager=3.7.0
+scrapy-selenium
