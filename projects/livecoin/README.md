@@ -40,4 +40,4 @@ Output dataset json file by command
 scrapy crawl coin -o dataset.json
 ```
 
-
+`coin_selenium.py` uses scrapy and selenium.

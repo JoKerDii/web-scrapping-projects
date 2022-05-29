@@ -211,4 +211,30 @@ end)
 
 ## Selenium
 
+```
+pip install scrapy_selenium
+```
 
+## Store data in MongoDB
+
+```
+pip install pymongo dnspython
+```
+Modify `pipelines.py`, and `settings.py` (change to MongodbPipeline).
+
+Create an account on MongoDB cloud. Create a new cluster. Config databased access and network access (0.0.0.0/0). 
+
+Connect to the cluster. Connect -> connect to your application -> config the language -> copy the application code and paste in 'pipelines.py' -> replace <password> with the actual password.
+
+Run `scrapy crawl best_moviews` and check the collection on MongoDB. The data are store in it.
+
+
+## Store data in SQLite3
+
+Note that sqlite3 is already included in python standard library so we don't need to install it.
+
+Modify `pipelines.py` and `settings.py` (change to SQLlitePipeline).
+
+Run `scrapy crawl best_moviews` then we get a `imdb.db` file.
+
+Install SQLits extension in vscode. Right clide and open the `imdb.db`.

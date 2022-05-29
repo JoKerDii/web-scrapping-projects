@@ -5,3 +5,5 @@ scrapy-splash==0.8.0
 selenium=4.2.0
 webdriver-manager=3.7.0
 scrapy-selenium
+dnspython=2.2.1
+pymongo=4.1.1

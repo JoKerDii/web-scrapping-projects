@@ -34,6 +34,5 @@ class BestMoviesSpider(CrawlSpider):
             'duration' : "".join(response.xpath("//div[@class='sc-94726ce4-3 eSKKHi']/ul/li[3]/text()").extract()),
             'genre' : response.xpath("//div[@class='ipc-chip-list sc-16ede01-5 ggbGKe']/a/ul/li/text()").get(),
             'rating' : response.xpath("//div[@class = 'sc-7ab21ed2-2 kYEdvH']/span/text()").get(),
-            'movie_url' : response.url,
-            'user-agent': response.request.headers['User-Agent']
+            'movie_url' : response.url
         }
